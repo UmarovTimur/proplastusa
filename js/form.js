@@ -1,14 +1,14 @@
 "use strict"
 
+
+
 document.addEventListener('DOMContentLoaded', function () {
    const form = document.getElementById('form');
    form.addEventListener('submit', formSend);
 
    async function formSend(e) {
       e.preventDefault();
-
       let error = formValidate(form);
-
       let formData = new FormData(form);
       const resultPopap = document.querySelector('.result-popap');
       resultPopap.addEventListener('click', function () {
@@ -16,19 +16,23 @@ document.addEventListener('DOMContentLoaded', function () {
       })
       if (error === 0) {
          form.classList.add('_sending');
-         let response = await fetch('./sendmail.php', {
+         let response = await fetch('/sendmail.php', {
             method: 'POST',
             body: formData,
          });
+         // console.log(response.ok);
+         // console.log(response);
+
          if (response.ok) {
+            let result = await response.json();
             form.classList.remove('_sending');
             resultPopap.classList.add('_active');
-            resultPopap.innerHTML = result;
+            resultPopap.innerHTML = result.message;
             form.reset();
-            let result = await response.json();
          } else {
             form.classList.remove('_sending');
             resultPopap.classList.add('_active');
+            console.log(response.message);
             resultPopap.innerHTML = `Server error`;
          }
       } else {
@@ -36,7 +40,6 @@ document.addEventListener('DOMContentLoaded', function () {
          resultPopap.innerHTML = `Fill in required fields`;
       }
    }
-
    function formValidate(form) {
       let error = 0;
       let formReq = document.querySelectorAll('._req');
@@ -50,6 +53,7 @@ document.addEventListener('DOMContentLoaded', function () {
       }
       return error;
    }
+
    function formAddError(input) {
       input.parentElement.classList.add('_error');
       input.classList.add('_error');
